@@ -48,7 +48,8 @@ export default function HistoryPage() {
           fontSize: '24px',
           fontWeight: 'bold',
           maxWidth: '600px',
-          margin: '20 auto',
+          margin: '0 auto',
+		  marginBottom: '20px',
           boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
         }}
       >
