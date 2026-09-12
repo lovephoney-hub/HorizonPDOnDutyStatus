@@ -194,28 +194,28 @@ export default function Home() {
         ))}
       </div>
 
-		<div
-		  style={{
-			position: 'fixed',        // ← sticks to screen
-			bottom: 0,                // ← bottom of viewport
-			left: 0,
-			right: 0,
-			backgroundColor: 'white',
-			color: 'black',
-			padding: '20px',
-			borderRadius: '12px',
-			textAlign: 'center',
-			fontSize: '24px',
-			fontWeight: 'bold',
-			maxWidth: '600px',
-			margin: '0 auto 20px auto',   // ← centers footer + spacing from bottom
-			boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
-			zIndex: 999                 // ← stays above page content
-		  }}
-		>
-		  <a href="/history" style={{ marginRight: 20 }}>History</a>
-		  <a href="/summary">Summary</a>
-		</div>
+		//<div
+		//  style={{
+		//	position: 'fixed',        // ← sticks to screen
+		//	bottom: 0,                // ← bottom of viewport
+		//	left: 0,
+		//	right: 0,
+		//	backgroundColor: 'white',
+		//	color: 'black',
+		//	padding: '20px',
+		//	borderRadius: '12px',
+		//	textAlign: 'center',
+		//	fontSize: '24px',
+		//	fontWeight: 'bold',
+		//	maxWidth: '600px',
+		//	margin: '0 auto 20px auto',   // ← centers footer + spacing from bottom
+		//	boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+		//	zIndex: 999                 // ← stays above page content
+		//  }}
+		//>
+		//  <a href="/history" style={{ marginRight: 20 }}>History</a>
+		//  <a href="/summary">Summary</a>
+		//</div>
 
 
       {/* Confirmation Modal */}
