@@ -102,7 +102,7 @@ export default function SummaryPage() {
       </div>
 
       {/* Date Range Filter */}
-      <div style={{ marginBottom: 20, color: 'white', fontSize: 18 }}>
+      <div style={{ backgroundColor: 'white', marginBottom: 20, color: 'white', fontSize: 18 }}>
         <div style={{ marginBottom: 10 }}>
           <label>Start Date:</label>
           <input
