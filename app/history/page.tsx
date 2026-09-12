@@ -37,9 +37,23 @@ export default function HistoryPage() {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      <h1 style={{ color: 'white', textShadow: '0 0 10px black' }}>
+      {/* Header Box */}
+      <div
+        style={{
+          backgroundColor: 'white',
+          color: 'blue',
+          padding: '20px',
+          borderRadius: '12px',
+          textAlign: 'center',
+          fontSize: '24px',
+          fontWeight: 'bold',
+          maxWidth: '600px',
+          margin: '0 auto',
+          boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
+        }}
+      >
         Lịch Sử Chấm Công
-      </h1>
+      </div>
 
       {records.map((r, index) => {
         const duration = r.duration_minutes || 0;
