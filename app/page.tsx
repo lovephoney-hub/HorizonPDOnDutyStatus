@@ -194,7 +194,7 @@ export default function Home() {
         ))}
       </div>
 
-		//<div
+	  {/*//<div
 		//  style={{
 		//	position: 'fixed',        // ← sticks to screen
 		//	bottom: 0,                // ← bottom of viewport
@@ -215,7 +215,7 @@ export default function Home() {
 		//>
 		//  <a href="/history" style={{ marginRight: 20 }}>History</a>
 		//  <a href="/summary">Summary</a>
-		//</div>
+	  //</div> */}
 
 
       {/* Confirmation Modal */}
