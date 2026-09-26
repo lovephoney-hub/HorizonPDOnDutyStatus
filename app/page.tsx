@@ -6,8 +6,10 @@ import { supabase } from '../lib/supabaseClient';
 type User = {
   id: string;
   name: string;
+  EID: string;
   avatar_url: string | null;
   is_clocked_in: boolean;
+  role: string;
 };
 
 export default function Home() {
@@ -19,20 +21,20 @@ export default function Home() {
     const { data } = await supabase
       .from('users')
       .select('*')
-      .order('name');
+      .order('EID', { ascending: true });
+
     setUsers(data || []);
   };
 
-	useEffect(() => {
-	  loadUsers();
+  useEffect(() => {
+    loadUsers();
 
-	  const interval = setInterval(() => {
-		loadUsers();
-	  }, 5000); // refresh every 5 seconds
+    const interval = setInterval(() => {
+      loadUsers();
+    }, 5000); // refresh every 5 seconds
 
-	  return () => clearInterval(interval);
-	}, []);
-
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleClock = async (user: User) => {
     const now = new Date();
@@ -44,14 +46,13 @@ export default function Home() {
         .update({ is_clocked_in: true })
         .eq('id', user.id);
 
-		await supabase
-		  .from('clock_records')
-		  .insert({
-			user_id: user.id,
-			user_name: user.name,        // ← store name here
-			clock_in_at: utc7.toISOString()
-		  });
-
+      await supabase
+        .from('clock_records')
+        .insert({
+          user_id: user.id,
+          user_name: user.name,
+          clock_in_at: utc7.toISOString()
+        });
 
     } else {
       await supabase
@@ -93,6 +94,7 @@ export default function Home() {
     if (selectedUser) {
       await toggleClock(selectedUser);
     }
+
     setShowConfirm(false);
     setSelectedUser(null);
   };
@@ -101,6 +103,14 @@ export default function Home() {
     setShowConfirm(false);
     setSelectedUser(null);
   };
+
+const getNameFontSize = (name: string) => {
+  if (name.length <= 15) return 15;
+  if (name.length <= 18) return 14;
+  if (name.length <= 21) return 13;
+  if (name.length <= 24) return 12;
+  return 11;
+};
 
   return (
     <div
@@ -134,89 +144,183 @@ export default function Home() {
       <div style={{ height: '40px' }}></div>
 
       {/* User Grid */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(7, 1fr)',
+          gap: 20,
+          justifyItems: 'center',
+          width: '100%',
+          maxWidth: '1400px',
+          margin: '0 auto'
+        }}
+      >
+
+	{users.map(u => (
+	  <div
+		key={u.id}
+		onClick={() => openConfirm(u)}
+		style={{
+		  width: 180,
+		  height: 270,
+		  borderRadius: 14,
+		  overflow: 'hidden',
+		  cursor: 'pointer',
+		  position: 'relative',
+
+		  backgroundImage: 'url("/avatars/id.png")',
+		  backgroundSize: 'cover',
+		  backgroundPosition: 'center',
+
+		  boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+
+		  display: 'flex',
+		  flexDirection: 'column',
+		  alignItems: 'center',
+
+		  transition: 'transform 0.15s ease, box-shadow 0.15s ease'
+		}}
+	  >
+
+		{/* Light overlay to make text easier to read */}
 		<div
 		  style={{
-			display: 'grid',
-			gridTemplateColumns: 'repeat(7, 1fr)',   // ← 7 per row
-			gap: 20,
-			justifyItems: 'center',                  // ← center each card
+			position: 'absolute',
+			inset: 0,
+			backgroundColor: 'rgba(255,255,255,0.25)',
+			pointerEvents: 'none'
+		  }}
+		/>
+
+		{/* Content */}
+		<div
+		  style={{
+			position: 'relative',
+			zIndex: 1,
 			width: '100%',
-			maxWidth: '1400px',
-			margin: '0 auto'
+			height: '100%',
+			display: 'flex',
+			flexDirection: 'column',
+			alignItems: 'center',
+			paddingTop: 42,
+			boxSizing: 'border-box'
 		  }}
 		>
 
-        {users.map(u => (
-          <div
-            key={u.id}
-            onClick={() => openConfirm(u)}
-            style={{
-              border: '1px solid #ccc',
-              padding: 16,
-              cursor: 'pointer',
-              width: 140,
-              borderRadius: 12,
-              backgroundColor: 'white',
-              color: 'black',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center'
-            }}
-          >
-            <img
-              src={u.avatar_url || ''}
-              alt={u.name}
-              style={{
-                width: 72,
-                height: 72,
-                borderRadius: '50%',
-                objectFit: 'cover',
-                marginBottom: 10
-              }}
-            />
+		  {/* Avatar */}
+		  <img
+			src={u.avatar_url || ''}
+			alt={u.name}
+			style={{
+			  width: 82,
+			  height: 82,
+			  borderRadius: '50%',
+			  objectFit: 'cover',
+			  border: '4px solid white',
+			  boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+			  backgroundColor: '#eee',
+			  marginBottom: 10
+			}}
+		  />
 
-            <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 10 }}>
-              {u.name}
-            </div>
+		  {/* EID */}
+		<div
+		  style={{
+			alignSelf: 'flex-start',
+			marginLeft: 5,
+			backgroundColor: 'rgba(255,255,255,0.88)',
+			padding: '3px 12px',
+			borderRadius: 20,
+			fontSize: 18,
+			fontWeight: 800,
+			color: '#123c66',
+			marginBottom: 6,
+			boxShadow: '0 1px 3px rgba(0,0,0,0.15)'
+		  }}
+		>
+		  ID:{u.EID}
+		</div>
 
-            <div
-              style={{
-                width: 16,
-                height: 16,
-                borderRadius: '50%',
-                backgroundColor: u.is_clocked_in ? 'green' : 'red'
-              }}
-            />
-          </div>
-        ))}
+		  {/* Name */}
+		<div
+		  style={{
+			alignSelf: 'flex-start',
+			marginLeft: 5,
+			backgroundColor: 'rgba(255,255,255,0.88)',
+			padding: '4px 10px',
+			borderRadius: 6,
+			fontSize: getNameFontSize(u.name),
+			fontWeight: 700,
+			color: '#111',
+			textAlign: 'left',
+			whiteSpace: 'nowrap',
+			lineHeight: 1.2,
+			marginBottom: 5
+		  }}
+		>
+		  Tên:{u.name}
+		</div>
+
+		  {/* Role */}
+		<div
+		  style={{
+			alignSelf: 'flex-start',
+			marginLeft: 5,
+			backgroundColor: 'rgba(255,255,255,0.80)',
+			padding: '3px 9px',
+			borderRadius: 5,
+			fontSize: 12,
+			fontWeight: 600,
+			color: '#333',
+			textAlign: 'left'
+		  }}
+		>
+		  {u.role}
+		</div>
+
+		  {/* Status */}
+		  <div
+			style={{
+			  position: 'absolute',
+			  bottom: 10,
+			  display: 'flex',
+			  alignItems: 'center',
+			  gap: 7,
+			  backgroundColor: 'rgba(255,255,255,0.9)',
+			  padding: '5px 12px',
+			  borderRadius: 20,
+			  boxShadow: '0 2px 4px rgba(0,0,0,0.15)'
+			}}
+		  >
+			<div
+			  style={{
+				width: 14,
+				height: 14,
+				borderRadius: '50%',
+				backgroundColor: u.is_clocked_in ? '#16a34a' : '#dc2626',
+				boxShadow: `0 0 5px ${
+				  u.is_clocked_in
+					? 'rgba(22,163,74,0.6)'
+					: 'rgba(220,38,38,0.6)'
+				}`
+			  }}
+			/>
+
+			<span
+			  style={{
+				fontSize: 11,
+				fontWeight: 700,
+				color: u.is_clocked_in ? '#166534' : '#991b1b'
+			  }}
+			>
+			  {u.is_clocked_in ? 'ON DUTY' : 'OFF DUTY'}
+			</span>
+		  </div>
+
+		</div>
+	  </div>
+	))}
       </div>
-
-	  {/*//<div
-		//  style={{
-		//	position: 'fixed',        // ← sticks to screen
-		//	bottom: 0,                // ← bottom of viewport
-		//	left: 0,
-		//	right: 0,
-		//	backgroundColor: 'white',
-		//	color: 'black',
-		//	padding: '20px',
-		//	borderRadius: '12px',
-		//	textAlign: 'center',
-		//	fontSize: '24px',
-		//	fontWeight: 'bold',
-		//	maxWidth: '600px',
-		//	margin: '0 auto 20px auto',   // ← centers footer + spacing from bottom
-		//	boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
-		//	zIndex: 999                 // ← stays above page content
-		//  }}
-		//>
-		//  <a href="/history" style={{ marginRight: 20 }}>History</a>
-		//  <a href="/summary">Summary</a>
-	  //</div> */}
-
 
       {/* Confirmation Modal */}
       {showConfirm && selectedUser && (
@@ -228,7 +332,7 @@ export default function Home() {
             width: '100vw',
             height: '100vh',
             backgroundColor: 'rgba(0,0,0,0.5)',
-			color: 'black',
+            color: 'black',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -245,17 +349,34 @@ export default function Home() {
               boxShadow: '0 4px 10px rgba(0,0,0,0.3)'
             }}
           >
-            <div style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 20 }}>
-              
+            <div
+              style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                marginBottom: 20
+              }}
+            >
             </div>
 
             <div style={{ marginBottom: 20 }}>
-              {selectedUser.is_clocked_in ? 'Ngừng Chấm Công' : 'Bắt Đầu Chấm Công'} cho:
+              {selectedUser.is_clocked_in
+                ? 'Ngừng Chấm Công'
+                : 'Bắt Đầu Chấm Công'} cho:
               <br />
-              <strong>{selectedUser.name}</strong>
+
+              {/* EID + Name in Confirmation */}
+              <strong>
+                {selectedUser.EID} - {selectedUser.name}
+              </strong>
             </div>
 
-            <div style={{ display: 'flex', gap: 20, justifyContent: 'center' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: 20,
+                justifyContent: 'center'
+              }}
+            >
               <button
                 onClick={confirmAction}
                 style={{
