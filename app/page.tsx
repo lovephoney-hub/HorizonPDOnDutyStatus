@@ -17,14 +17,25 @@ export default function Home() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const loadUsers = async () => {
-    const { data } = await supabase
-      .from('users')
-      .select('*')
-      .order('EID', { ascending: true });
 
-    setUsers(data || []);
-  };
+ const loadUsers = async () => {
+  const { data } = await supabase
+    .from('users')
+    .select('*');
+
+  const sortedUsers = (data || []).sort((a, b) => {
+    // On duty first
+    if (a.is_clocked_in !== b.is_clocked_in) {
+      return a.is_clocked_in ? -1 : 1;
+    }
+
+    // Then sort by EID
+    return Number(a.EID) - Number(b.EID);
+  });
+
+  setUsers(sortedUsers);
+};
+ 
 
   useEffect(() => {
     loadUsers();
@@ -124,37 +135,43 @@ const getNameFontSize = (name: string) => {
     >
 
       {/* Header Box */}
-      <div
-        style={{
-          backgroundColor: 'white',
-          color: 'blue',
-          padding: '20px',
-          borderRadius: '12px',
-          textAlign: 'center',
-          fontSize: '24px',
-          fontWeight: 'bold',
-          maxWidth: '600px',
-          margin: '0 auto',
-          boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
-        }}
-      >
-        Horizon PD On Duty Status
-      </div>
+{/* Banner */}
+<div
+  style={{
+    width: '40%',
+    height: '30%',
+    overflow: 'hidden',
+    borderRadius: '12px',
+	margin: '0 auto',
+  }}
+>
+  <img
+    src="/avatars/Header.png"
+    alt="Horizon EMS On Duty Status"
+    style={{
+      width: '100%',
+      height: '100%',
+      objectFit: 'contain',
+      display: 'block',
+      borderRadius: '12px',
+    }}
+  />
+</div>
 
-      <div style={{ height: '40px' }}></div>
+<div style={{ height: '40px' }}></div>
 
       {/* User Grid */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(7, 1fr)',
-          gap: 20,
-          justifyItems: 'center',
-          width: '100%',
-          maxWidth: '1400px',
-          margin: '0 auto'
-        }}
-      >
+		<div
+		  style={{
+			display: 'grid',
+			gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+			gap: 24,
+			width: '100%',
+			maxWidth: '1400px',
+			margin: '0 auto',
+			boxSizing: 'border-box'
+		  }}
+		>
 
 	{users.map(u => (
 	  <div
@@ -208,37 +225,47 @@ const getNameFontSize = (name: string) => {
 		>
 
 		  {/* Avatar */}
-		  <img
-			src={u.avatar_url || ''}
-			alt={u.name}
-			style={{
-			  width: 82,
-			  height: 82,
-			  borderRadius: '50%',
-			  objectFit: 'cover',
-			  border: '4px solid white',
-			  boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
-			  backgroundColor: '#eee',
-			  marginBottom: 10
-			}}
-		  />
+		<img
+		  src={u.avatar_url || ''}
+		  alt={u.name}
+		  style={{
+			width: 82,
+			height: 82,
+			borderRadius: '50%',
+			objectFit: 'cover',
+
+			border: u.is_clocked_in
+			  ? '4px solid #39ff14'
+			  : '4px solid white',
+
+			boxShadow: u.is_clocked_in
+			  ? '0 0 10px #39ff14, 0 0 20px rgba(57,255,20,0.8)'
+			  : '0 2px 6px rgba(0,0,0,0.3)',
+
+			backgroundColor: u.is_clocked_in
+			  ? '#39ff14'
+			  : '#eee',
+
+			marginBottom: 5
+		  }}
+		/>
 
 		  {/* EID */}
 		<div
 		  style={{
-			alignSelf: 'flex-start',
 			marginLeft: 5,
-			backgroundColor: 'rgba(255,255,255,0.88)',
-			padding: '3px 12px',
-			borderRadius: 20,
+			//backgroundColor: 'red',
+			//padding: '3px 12px',
+			//borderRadius: 20,
 			fontSize: 18,
 			fontWeight: 800,
-			color: '#123c66',
-			marginBottom: 6,
-			boxShadow: '0 1px 3px rgba(0,0,0,0.15)'
+			marginBottom: 20,
+			alignSelf: 'center',
+			color: '#D64227',
+			//boxShadow: '0 1px 3px rgba(0,0,0,0.15)'
 		  }}
 		>
-		  ID:{u.EID}
+		  EID:{u.EID}
 		</div>
 
 		  {/* Name */}
@@ -246,19 +273,19 @@ const getNameFontSize = (name: string) => {
 		  style={{
 			alignSelf: 'flex-start',
 			marginLeft: 5,
-			backgroundColor: 'rgba(255,255,255,0.88)',
-			padding: '4px 10px',
-			borderRadius: 6,
+			//backgroundColor: 'rgba(255,255,255,0.88)',
+			//padding: '4px 10px',
+			//borderRadius: 6,
 			fontSize: getNameFontSize(u.name),
 			fontWeight: 700,
 			color: '#111',
 			textAlign: 'left',
 			whiteSpace: 'nowrap',
 			lineHeight: 1.2,
-			marginBottom: 5
+			marginBottom: 10
 		  }}
 		>
-		  Tên:{u.name}
+		  Tên: {u.name}
 		</div>
 
 		  {/* Role */}
@@ -266,8 +293,8 @@ const getNameFontSize = (name: string) => {
 		  style={{
 			alignSelf: 'flex-start',
 			marginLeft: 5,
-			backgroundColor: 'rgba(255,255,255,0.80)',
-			padding: '3px 9px',
+			//backgroundColor: 'rgba(255,255,255,0.80)',
+			//padding: '3px 9px',
 			borderRadius: 5,
 			fontSize: 12,
 			fontWeight: 600,
