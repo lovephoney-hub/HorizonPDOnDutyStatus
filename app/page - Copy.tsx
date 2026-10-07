@@ -250,7 +250,7 @@ const getNameFontSize = (name: string) => {
 		  }}
 		/>
 
-		  {/* CMND */}
+		  {/* EID */}
 		<div
 		  style={{
 			marginLeft: 5,
@@ -265,7 +265,7 @@ const getNameFontSize = (name: string) => {
 			//boxShadow: '0 1px 3px rgba(0,0,0,0.15)'
 		  }}
 		>
-		  {u.CMND}
+		  EID:{u.EID}
 		</div>
 
 		  {/* Name */}
